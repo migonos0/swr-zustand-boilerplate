@@ -2,11 +2,15 @@ import {useEffect, useState} from 'react';
 import useSWR from 'swr';
 import {
     CREATE_ONE_TEST,
+    DELETE_ONE_TEST_BY_ID,
     FIND_ALL_TESTS,
+    UPDATE_ONE_TEST_BY_ID,
 } from './constants/restEndpoints/TEST.restendpoint';
 import {
     createLocalTestActionHandler,
     createOneTestActionHandler,
+    deleteOneTestByIdActionHandler,
+    updateOneTestByIdActionHandler,
 } from './services/store/actions/test.action';
 import {
     getTestDispatcher,
@@ -36,6 +40,34 @@ function App() {
                                 ...(tests ?? []),
                                 ...[testState.test],
                             ]);
+                            return;
+                        }
+                    }
+                    return;
+                }
+                case 'PUT': {
+                    switch (testState.requestedOriginalUrl) {
+                        case UPDATE_ONE_TEST_BY_ID.originalUrl: {
+                            testsMutator(
+                                tests?.map((test) =>
+                                    test._id === testState.test._id
+                                        ? testState.test
+                                        : test
+                                )
+                            );
+                            return;
+                        }
+                    }
+                    return;
+                }
+                case 'DELETE': {
+                    switch (testState.requestedOriginalUrl) {
+                        case DELETE_ONE_TEST_BY_ID.originalUrl: {
+                            testsMutator(
+                                tests?.filter(
+                                    (test) => test._id !== testState.test._id
+                                )
+                            );
                             return;
                         }
                     }
@@ -85,7 +117,31 @@ function App() {
             <ul>
                 {tests &&
                     tests.map((test, index) => (
-                        <li key={index}>{test.name}</li>
+                        <div key={index}>
+                            <li>{test.name}</li>
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    updateOneTestByIdActionHandler({
+                                        name: remoteInput,
+                                    })(test._id)(UPDATE_ONE_TEST_BY_ID)(
+                                        getTestDispatcher(useStore)
+                                    );
+                                }}
+                            >
+                                Update
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    deleteOneTestByIdActionHandler()(test._id)(
+                                        DELETE_ONE_TEST_BY_ID
+                                    )(getTestDispatcher(useStore));
+                                }}
+                            >
+                                Delete
+                            </button>
+                        </div>
                     ))}
             </ul>
         </>

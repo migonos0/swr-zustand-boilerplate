@@ -28,7 +28,7 @@ export const findAllTestsHandler: RestHandler<Test[]> =
 
 export const updateOneTestByIdHandler: RestHandler<
     Test,
-    UpdateOneTestByIdInput,
+    Omit<UpdateOneTestByIdInput, 'testId'>,
     UpdateOneTestByIdInput['testId']
 > = (input) => (testId) => async (originalUrl) => {
     return (await httpClient.put(`${originalUrl}/${testId}`, input)).data;
