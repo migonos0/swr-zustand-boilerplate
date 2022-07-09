@@ -1,27 +1,27 @@
 import {useEffect, useState} from 'react';
 import useSWR from 'swr';
 import {
-    CREATE_ONE_TEST,
-    DELETE_ONE_TEST_BY_ID,
-    FIND_ALL_TESTS,
-    UPDATE_ONE_TEST_BY_ID,
-} from './constants/restEndpoints/TEST.restendpoint';
+    CREATE_ONE_TEST_RESTENDPOINT,
+    DELETE_ONE_TEST_BY_ID_RESTENDPOINT,
+    FIND_ALL_TESTS_RESTENDPOINT,
+    UPDATE_ONE_TEST_BY_ID_RESTENDPOINT,
+} from './constants/restEndpoints/test.restEndpoint';
 import {
     createLocalTestActionHandler,
     createOneTestActionHandler,
     deleteOneTestByIdActionHandler,
     updateOneTestByIdActionHandler,
-} from './services/store/actions/test.action';
+} from './services/store/actionHandlers/test.actionHandler';
 import {
     getTestDispatcher,
     testStateSelector,
 } from './services/store/slices/test.slice';
 import {useStore} from './services/store/useStore';
-import {findAllTestsHandler} from './services/webapis/rest/test.rest';
+import {findAllTestsHandler} from './services/webApis/restHandlers/test.restHandler';
 
 function App() {
     const {data: tests, mutate: testsMutator} = useSWR(
-        FIND_ALL_TESTS.originalUrl,
+        FIND_ALL_TESTS_RESTENDPOINT.originalUrl,
         findAllTestsHandler()()
     );
     const testState = useStore(testStateSelector);
@@ -35,7 +35,7 @@ function App() {
             switch (testState.requestedMethod) {
                 case 'POST': {
                     switch (testState.requestedOriginalUrl) {
-                        case CREATE_ONE_TEST.originalUrl: {
+                        case CREATE_ONE_TEST_RESTENDPOINT.originalUrl: {
                             testsMutator([
                                 ...(tests ?? []),
                                 ...[testState.test],
@@ -47,7 +47,7 @@ function App() {
                 }
                 case 'PUT': {
                     switch (testState.requestedOriginalUrl) {
-                        case UPDATE_ONE_TEST_BY_ID.originalUrl: {
+                        case UPDATE_ONE_TEST_BY_ID_RESTENDPOINT.originalUrl: {
                             testsMutator(
                                 tests?.map((test) =>
                                     test._id === testState.test._id
@@ -62,7 +62,7 @@ function App() {
                 }
                 case 'DELETE': {
                     switch (testState.requestedOriginalUrl) {
-                        case DELETE_ONE_TEST_BY_ID.originalUrl: {
+                        case DELETE_ONE_TEST_BY_ID_RESTENDPOINT.originalUrl: {
                             testsMutator(
                                 tests?.filter(
                                     (test) => test._id !== testState.test._id
@@ -108,7 +108,7 @@ function App() {
                 type="button"
                 onClick={() => {
                     createOneTestActionHandler({name: remoteInput})()(
-                        CREATE_ONE_TEST
+                        CREATE_ONE_TEST_RESTENDPOINT
                     )(getTestDispatcher(useStore));
                 }}
             >
@@ -124,7 +124,7 @@ function App() {
                                 onClick={() => {
                                     updateOneTestByIdActionHandler({
                                         name: remoteInput,
-                                    })(test._id)(UPDATE_ONE_TEST_BY_ID)(
+                                    })(test._id)(UPDATE_ONE_TEST_BY_ID_RESTENDPOINT)(
                                         getTestDispatcher(useStore)
                                     );
                                 }}
@@ -135,7 +135,7 @@ function App() {
                                 type="button"
                                 onClick={() => {
                                     deleteOneTestByIdActionHandler()(test._id)(
-                                        DELETE_ONE_TEST_BY_ID
+                                        DELETE_ONE_TEST_BY_ID_RESTENDPOINT
                                     )(getTestDispatcher(useStore));
                                 }}
                             >

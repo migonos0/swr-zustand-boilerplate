@@ -6,15 +6,15 @@ import {
 import {ActionHandler} from '../../../types/ActionHandler.type';
 import {findActionErrorMessage} from '../../../utilities/findActionErrorMessage.utility';
 import {
-    createOneTestHandler,
-    deleteOneTestByIdHandler,
-    updateOneTestByIdHandler,
-} from '../../webapis/rest/test.rest';
-import {TEST} from '../actiontypes/TEST.actiontype';
+    createOneTestRestHandler,
+    deleteOneTestByIdRestHandler,
+    updateOneTestByIdRestHandler,
+} from '../../webApis/restHandlers/test.restHandler';
+import {TEST_ACTIONTYPE} from '../actionTypes/test.actionType';
 import {GlobalState} from '../useStore';
 
 export const createLocalTestActionHandler: ActionHandler<
-    TEST,
+    TEST_ACTIONTYPE,
     GlobalState['testState'],
     string
 > = (input) => () => () => (dispatcher) => {
@@ -31,7 +31,7 @@ export const createLocalTestActionHandler: ActionHandler<
 };
 
 export const createOneTestActionHandler: ActionHandler<
-    TEST,
+    TEST_ACTIONTYPE,
     GlobalState['testState'],
     CreateOneTestInput
 > = (input) => () => (restEndpoint) => async (dispatcher) => {
@@ -44,7 +44,7 @@ export const createOneTestActionHandler: ActionHandler<
             },
         });
         if (!restEndpoint) return;
-        const createdTest = await createOneTestHandler(input)()(
+        const createdTest = await createOneTestRestHandler(input)()(
             restEndpoint.originalUrl
         );
         dispatcher({
@@ -72,7 +72,7 @@ export const createOneTestActionHandler: ActionHandler<
 };
 
 export const updateOneTestByIdActionHandler: ActionHandler<
-    TEST,
+    TEST_ACTIONTYPE,
     GlobalState['testState'],
     Omit<UpdateOneTestByIdInput, 'testId'>,
     UpdateOneTestByIdInput['testId']
@@ -87,7 +87,7 @@ export const updateOneTestByIdActionHandler: ActionHandler<
         });
 
         if (!endpoint) return;
-        const updatedTest = await updateOneTestByIdHandler(input)(testId)(
+        const updatedTest = await updateOneTestByIdRestHandler(input)(testId)(
             endpoint.originalUrl
         );
         dispatcher({
@@ -114,7 +114,7 @@ export const updateOneTestByIdActionHandler: ActionHandler<
 };
 
 export const deleteOneTestByIdActionHandler: ActionHandler<
-    TEST,
+    TEST_ACTIONTYPE,
     GlobalState['testState'],
     DeleteOneTestByIdInput,
     DeleteOneTestByIdInput['testId']
@@ -128,7 +128,7 @@ export const deleteOneTestByIdActionHandler: ActionHandler<
             },
         });
         if (!endpoint) return;
-        const deletedTest = await deleteOneTestByIdHandler()(testId)(
+        const deletedTest = await deleteOneTestByIdRestHandler()(testId)(
             endpoint.originalUrl
         );
         dispatcher({

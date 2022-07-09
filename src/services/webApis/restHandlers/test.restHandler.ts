@@ -6,14 +6,14 @@ import {
     UpdateOneTestByIdInput,
 } from '../../../schemas/test.schema';
 import {RestHandler} from '../../../types/RestHandler.type';
-import {httpClient} from '../../../utilities/httpClient.utility';
+import {httpClient} from '../../../libs/httpClient.lib';
 
-export const createOneTestHandler: RestHandler<Test, CreateOneTestInput> =
+export const createOneTestRestHandler: RestHandler<Test, CreateOneTestInput> =
     (input) => () => async (originalUrl) => {
         return (await httpClient.post(originalUrl, input)).data;
     };
 
-export const findOneTestByIdHandler: RestHandler<
+export const findOneTestByIdRestHandler: RestHandler<
     Test,
     FindOneTestByIdInput,
     FindOneTestByIdInput['testId']
@@ -26,7 +26,7 @@ export const findAllTestsHandler: RestHandler<Test[]> =
         return (await httpClient.get(originalUrl)).data;
     };
 
-export const updateOneTestByIdHandler: RestHandler<
+export const updateOneTestByIdRestHandler: RestHandler<
     Test,
     Omit<UpdateOneTestByIdInput, 'testId'>,
     UpdateOneTestByIdInput['testId']
@@ -34,7 +34,7 @@ export const updateOneTestByIdHandler: RestHandler<
     return (await httpClient.put(`${originalUrl}/${testId}`, input)).data;
 };
 
-export const deleteOneTestByIdHandler: RestHandler<
+export const deleteOneTestByIdRestHandler: RestHandler<
     Test,
     DeleteOneTestByIdInput,
     DeleteOneTestByIdInput['testId']

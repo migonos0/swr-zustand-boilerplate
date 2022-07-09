@@ -2,8 +2,8 @@ import {CreateSlice} from '../../../types/CreateSlice.type';
 import {Reducer} from '../../../types/Reducer.type';
 import {GlobalState} from '../useStore';
 import {Action} from '../../../types/Action.type';
-import {TEST} from '../actiontypes/TEST.actiontype';
-import {DispatcherGetter} from '../../../types/DispatcherGetter.type';
+import {TEST_ACTIONTYPE} from '../actionTypes/test.actionType';
+import {DispatchGetter} from '../../../types/DispatchGetter.type';
 import {StateSelector} from '../../../types/StateSelector.type';
 import {Test} from '../../../interfaces/Test.interface';
 import {HttpRequestMethod} from '../../../types/HttpRequestMethod.type';
@@ -33,7 +33,7 @@ const initialState: SliceState = {
 };
 
 type ActionPayload = SliceState;
-type SliceAction = Action<TEST, ActionPayload>;
+type SliceAction = Action<TEST_ACTIONTYPE, ActionPayload>;
 
 const reducer: Reducer<SliceState, SliceAction> = (state, action) => {
     switch (action.type) {
@@ -95,8 +95,9 @@ export const createTestSlice: CreateSlice<GlobalState, TestSlice> = (
     };
 };
 
-export const getTestDispatcher: DispatcherGetter<TEST, ActionPayload> = (
-    useStore
-) => useStore.getState().testDispatcher;
+export const getTestDispatcher: DispatchGetter<
+    TEST_ACTIONTYPE,
+    ActionPayload
+> = (useStore) => useStore.getState().testDispatcher;
 export const testStateSelector: StateSelector<SliceState> = (state) =>
     state.testState;

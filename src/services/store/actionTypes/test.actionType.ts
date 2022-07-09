@@ -1,4 +1,4 @@
-export type TEST =
+export type TEST_ACTIONTYPE =
     | 'CREATE_LOCAL_TEST'
     | 'TEST_ACTION_LOADING'
     | 'TEST_ACTION_SUCCESS'
