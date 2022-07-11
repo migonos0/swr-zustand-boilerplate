@@ -50,7 +50,7 @@ function App() {
                         case UPDATE_ONE_TEST_BY_ID_RESTENDPOINT.originalUrl: {
                             testsMutator(
                                 tests?.map((test) =>
-                                    test._id === testState.test._id
+                                    test.id === testState.test.id
                                         ? testState.test
                                         : test
                                 )
@@ -65,7 +65,7 @@ function App() {
                         case DELETE_ONE_TEST_BY_ID_RESTENDPOINT.originalUrl: {
                             testsMutator(
                                 tests?.filter(
-                                    (test) => test._id !== testState.test._id
+                                    (test) => test.id !== testState.test.id
                                 )
                             );
                             return;
@@ -124,7 +124,7 @@ function App() {
                                 onClick={() => {
                                     updateOneTestByIdActionHandler({
                                         name: remoteInput,
-                                    })(test._id)(UPDATE_ONE_TEST_BY_ID_RESTENDPOINT)(
+                                    })(test.id)(UPDATE_ONE_TEST_BY_ID_RESTENDPOINT)(
                                         getTestDispatcher(useStore)
                                     );
                                 }}
@@ -134,7 +134,7 @@ function App() {
                             <button
                                 type="button"
                                 onClick={() => {
-                                    deleteOneTestByIdActionHandler()(test._id)(
+                                    deleteOneTestByIdActionHandler()(test.id)(
                                         DELETE_ONE_TEST_BY_ID_RESTENDPOINT
                                     )(getTestDispatcher(useStore));
                                 }}

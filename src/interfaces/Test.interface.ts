@@ -1,7 +1,4 @@
 export interface Test {
-    _id: string;
+    id: number;
     name: string;
-    isActive: boolean;
-    createdAt: Date;
-    updatedAt: Date;
 }

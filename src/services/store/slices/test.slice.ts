@@ -24,11 +24,8 @@ const initialState: SliceState = {
     requestedOriginalUrl: '',
     requestedMethod: 'POST',
     test: {
-        _id: '',
-        createdAt: new Date(),
-        isActive: true,
+        id: 0,
         name: '',
-        updatedAt: new Date(),
     },
 };
 
