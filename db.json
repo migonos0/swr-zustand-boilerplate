@@ -1,3 +1,8 @@
 {
-  "tests": []
+  "tests": [
+    {
+      "name": "asdfghj",
+      "id": 1
+    }
+  ]
 }
