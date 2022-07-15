@@ -24,7 +24,7 @@ import {
     execCallbackByRequestedRestEndpoint,
     handleGlobalStateChange,
     updateSWRCache,
-} from './utilities/swrCacheMutationHandlers';
+} from './utilities/swrCacheMutationHandlers.utility';
 
 function App() {
     const {data: tests, mutate: testsMutator} = useSWR(
