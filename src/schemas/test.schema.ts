@@ -1,9 +1,9 @@
-import {boolean, number, object, optional, string, TypeOf} from 'zod';
+import {number, object, optional, string, TypeOf} from 'zod';
 
 export const createOneTestSchema = object({
     name: string({
         required_error: 'Name is required.',
-    }).nonempty({message: 'Name must not be empty.'}),
+    }).min(1, {message: 'Name must not be empty.'}),
 });
 export type CreateOneTestInput = TypeOf<typeof createOneTestSchema>;
 

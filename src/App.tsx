@@ -18,11 +18,18 @@ import {
 } from './services/store/slices/test.slice';
 import {useStore} from './services/store/useStore';
 import {findAllTestsHandler} from './services/webApis/restHandlers/test.restHandler';
+import {
+    addSWRCache,
+    deleteSWRCache,
+    execCallbackByRequestedRestEndpoint,
+    handleGlobalStateChange,
+    updateSWRCache,
+} from './utilities/swrCacheMutationHandlers';
 
 function App() {
     const {data: tests, mutate: testsMutator} = useSWR(
         FIND_ALL_TESTS_RESTENDPOINT.originalUrl,
-        findAllTestsHandler()()
+        findAllTestsHandler()
     );
     const testState = useStore(testStateSelector);
     const [localInput, setLocalInput] = useState('');
@@ -30,53 +37,51 @@ function App() {
     const [localNotification, setLocalNotification] = useState('Ready');
 
     useEffect(() => {
-        if (!testState.loading && testState.success) {
-            setLocalNotification('Success ' + testState.message);
-            switch (testState.requestedMethod) {
-                case 'POST': {
-                    switch (testState.requestedOriginalUrl) {
-                        case CREATE_ONE_TEST_RESTENDPOINT.originalUrl: {
-                            testsMutator([
-                                ...(tests ?? []),
-                                ...[testState.test],
-                            ]);
-                            return;
-                        }
-                    }
-                    return;
-                }
-                case 'PUT': {
-                    switch (testState.requestedOriginalUrl) {
-                        case UPDATE_ONE_TEST_BY_ID_RESTENDPOINT.originalUrl: {
-                            testsMutator(
-                                tests?.map((test) =>
-                                    test.id === testState.test.id
-                                        ? testState.test
-                                        : test
-                                )
-                            );
-                            return;
-                        }
-                    }
-                    return;
-                }
-                case 'DELETE': {
-                    switch (testState.requestedOriginalUrl) {
-                        case DELETE_ONE_TEST_BY_ID_RESTENDPOINT.originalUrl: {
-                            testsMutator(
-                                tests?.filter(
-                                    (test) => test.id !== testState.test.id
-                                )
-                            );
-                            return;
-                        }
-                    }
-                }
-            }
-        }
-        if (!testState.loading && !testState.success) {
-            setLocalNotification('Error ' + testState.message);
-        }
+        handleGlobalStateChange({
+            loading: testState.loading,
+            success: testState.success,
+            successCallback() {
+                setLocalNotification('Success ' + testState.message);
+                execCallbackByRequestedRestEndpoint({
+                    requestedRestEndpoint: {
+                        method: testState.requestedEndpoint.method,
+                        originalUrl: testState.requestedEndpoint.originalUrl,
+                    },
+                    restEndpointsCallbacks: [
+                        {
+                            restEndpoint: CREATE_ONE_TEST_RESTENDPOINT,
+                            callback() {
+                                addSWRCache({
+                                    currentStates: tests,
+                                    newState: testState.test,
+                                    mutator: testsMutator,
+                                });
+                            },
+                        },
+                        {
+                            restEndpoint: UPDATE_ONE_TEST_BY_ID_RESTENDPOINT,
+                            callback() {
+                                updateSWRCache({
+                                    currentStates: tests,
+                                    newState: testState.test,
+                                    mutator: testsMutator,
+                                });
+                            },
+                        },
+                        {
+                            restEndpoint: DELETE_ONE_TEST_BY_ID_RESTENDPOINT,
+                            callback() {
+                                deleteSWRCache({
+                                    currentStates: tests,
+                                    newState: testState.test,
+                                    mutator: testsMutator,
+                                });
+                            },
+                        },
+                    ],
+                });
+            },
+        });
     }, [testState.loading, testState.success]);
 
     return (
@@ -90,9 +95,9 @@ function App() {
             <button
                 type="button"
                 onClick={() => {
-                    createLocalTestActionHandler(localInput)()()(
-                        getTestDispatcher(useStore)
-                    );
+                    createLocalTestActionHandler(getTestDispatcher(useStore))({
+                        input: localInput,
+                    });
                 }}
             >
                 Send
@@ -107,9 +112,11 @@ function App() {
             <button
                 type="button"
                 onClick={() => {
-                    createOneTestActionHandler({name: remoteInput})()(
-                        CREATE_ONE_TEST_RESTENDPOINT
-                    )(getTestDispatcher(useStore));
+                    createOneTestActionHandler(getTestDispatcher(useStore))({
+                        input: {
+                            name: remoteInput,
+                        },
+                    })(CREATE_ONE_TEST_RESTENDPOINT);
                 }}
             >
                 Send
@@ -122,11 +129,12 @@ function App() {
                             <button
                                 type="button"
                                 onClick={() => {
-                                    updateOneTestByIdActionHandler({
-                                        name: remoteInput,
-                                    })(test.id)(UPDATE_ONE_TEST_BY_ID_RESTENDPOINT)(
+                                    updateOneTestByIdActionHandler(
                                         getTestDispatcher(useStore)
-                                    );
+                                    )({
+                                        input: {name: remoteInput},
+                                        id: test.id,
+                                    })(UPDATE_ONE_TEST_BY_ID_RESTENDPOINT);
                                 }}
                             >
                                 Update
@@ -134,9 +142,11 @@ function App() {
                             <button
                                 type="button"
                                 onClick={() => {
-                                    deleteOneTestByIdActionHandler()(test.id)(
+                                    deleteOneTestByIdActionHandler(
+                                        getTestDispatcher(useStore)
+                                    )({id: test.id})(
                                         DELETE_ONE_TEST_BY_ID_RESTENDPOINT
-                                    )(getTestDispatcher(useStore));
+                                    );
                                 }}
                             >
                                 Delete

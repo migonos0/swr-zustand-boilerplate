@@ -3,7 +3,10 @@ import {
     DeleteOneTestByIdInput,
     UpdateOneTestByIdInput,
 } from '../../../schemas/test.schema';
-import {ActionHandler} from '../../../types/ActionHandler.type';
+import {
+    ActionHandler,
+    HttpActionHandler,
+} from '../../../types/ActionHandler.type';
 import {findActionErrorMessage} from '../../../utilities/findActionErrorMessage.utility';
 import {
     createOneTestRestHandler,
@@ -17,12 +20,12 @@ export const createLocalTestActionHandler: ActionHandler<
     TEST_ACTIONTYPE,
     GlobalState['testState'],
     string
-> = (input) => () => () => (dispatcher) => {
+> = (dispatcher) => (params) => {
     try {
         dispatcher({
             type: 'CREATE_LOCAL_TEST',
             payload: {
-                message: input,
+                message: params.input,
             },
         });
     } catch (error) {
@@ -30,11 +33,11 @@ export const createLocalTestActionHandler: ActionHandler<
     }
 };
 
-export const createOneTestActionHandler: ActionHandler<
+export const createOneTestActionHandler: HttpActionHandler<
     TEST_ACTIONTYPE,
     GlobalState['testState'],
     CreateOneTestInput
-> = (input) => () => (restEndpoint) => async (dispatcher) => {
+> = (dispatcher) => (params) => async (restEndpoint) => {
     try {
         dispatcher({
             type: 'TEST_ACTION_LOADING',
@@ -43,19 +46,17 @@ export const createOneTestActionHandler: ActionHandler<
                 success: false,
             },
         });
-        if (!restEndpoint) return;
-        const createdTest = await createOneTestRestHandler(input)()(
-            restEndpoint.originalUrl
-        );
+        const createdTest = await createOneTestRestHandler({
+            input: {name: params.input?.name ?? ''},
+        })(restEndpoint.originalUrl);
         dispatcher({
             type: 'TEST_ACTION_SUCCESS',
             payload: {
                 loading: false,
                 success: true,
                 message: 'Test successfully created',
-                requestedMethod: restEndpoint.method,
-                requestedOriginalUrl: restEndpoint.originalUrl,
                 test: createdTest,
+                requestedEndpoint: restEndpoint,
             },
         });
     } catch (error) {
@@ -71,12 +72,12 @@ export const createOneTestActionHandler: ActionHandler<
     }
 };
 
-export const updateOneTestByIdActionHandler: ActionHandler<
+export const updateOneTestByIdActionHandler: HttpActionHandler<
     TEST_ACTIONTYPE,
     GlobalState['testState'],
     Omit<UpdateOneTestByIdInput, 'testId'>,
     UpdateOneTestByIdInput['testId']
-> = (input) => (testId) => (endpoint) => async (dispatcher) => {
+> = (dispatcher) => (params) => async (endpoint) => {
     try {
         dispatcher({
             type: 'TEST_ACTION_LOADING',
@@ -86,8 +87,7 @@ export const updateOneTestByIdActionHandler: ActionHandler<
             },
         });
 
-        if (!endpoint) return;
-        const updatedTest = await updateOneTestByIdRestHandler(input)(testId)(
+        const updatedTest = await updateOneTestByIdRestHandler(params)(
             endpoint.originalUrl
         );
         dispatcher({
@@ -96,9 +96,8 @@ export const updateOneTestByIdActionHandler: ActionHandler<
                 loading: false,
                 success: true,
                 message: 'Test successfully updated',
-                requestedMethod: endpoint.method,
-                requestedOriginalUrl: endpoint.originalUrl,
                 test: updatedTest,
+                requestedEndpoint: endpoint,
             },
         });
     } catch (error) {
@@ -113,12 +112,12 @@ export const updateOneTestByIdActionHandler: ActionHandler<
     }
 };
 
-export const deleteOneTestByIdActionHandler: ActionHandler<
+export const deleteOneTestByIdActionHandler: HttpActionHandler<
     TEST_ACTIONTYPE,
     GlobalState['testState'],
     DeleteOneTestByIdInput,
     DeleteOneTestByIdInput['testId']
-> = () => (testId) => (endpoint) => async (dispatcher) => {
+> = (dispatcher) => (params) => async (endpoint) => {
     try {
         dispatcher({
             type: 'TEST_ACTION_LOADING',
@@ -127,8 +126,7 @@ export const deleteOneTestByIdActionHandler: ActionHandler<
                 success: false,
             },
         });
-        if (!endpoint) return;
-        const deletedTest = await deleteOneTestByIdRestHandler()(testId)(
+        const deletedTest = await deleteOneTestByIdRestHandler(params)(
             endpoint.originalUrl
         );
         dispatcher({
@@ -137,9 +135,8 @@ export const deleteOneTestByIdActionHandler: ActionHandler<
                 loading: false,
                 success: true,
                 message: 'Test successfully deleted.',
-                requestedMethod: endpoint.method,
-                requestedOriginalUrl: endpoint.originalUrl,
                 test: deletedTest,
+                requestedEndpoint: endpoint,
             },
         });
     } catch (error) {

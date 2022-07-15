@@ -5,24 +5,24 @@ import {
     FindOneTestByIdInput,
     UpdateOneTestByIdInput,
 } from '../../../schemas/test.schema';
-import {RestHandler} from '../../../types/RestHandler.type';
+import {GETRestHandler, RestHandler} from '../../../types/RestHandler.type';
 import {httpClient} from '../../../libs/httpClient.lib';
 
 export const createOneTestRestHandler: RestHandler<Test, CreateOneTestInput> =
-    (input) => () => async (originalUrl) => {
-        return (await httpClient.post(originalUrl, input)).data;
+    (params) => async (originalUrl) => {
+        return (await httpClient.post(originalUrl, params?.input)).data;
     };
 
-export const findOneTestByIdRestHandler: RestHandler<
+export const findOneTestByIdRestHandler: GETRestHandler<
     Test,
     FindOneTestByIdInput,
     FindOneTestByIdInput['testId']
-> = () => (testId) => async (originalUrl) => {
-    return (await httpClient.get(`${originalUrl}/${testId}`)).data;
+> = (params) => async (originalUrl) => {
+    return (await httpClient.get(`${originalUrl}/${params?.id}`)).data;
 };
 
-export const findAllTestsHandler: RestHandler<Test[]> =
-    () => () => async (originalUrl) => {
+export const findAllTestsHandler: GETRestHandler<Test[]> =
+    () => async (originalUrl) => {
         return (await httpClient.get(originalUrl)).data;
     };
 
@@ -30,14 +30,15 @@ export const updateOneTestByIdRestHandler: RestHandler<
     Test,
     Omit<UpdateOneTestByIdInput, 'testId'>,
     UpdateOneTestByIdInput['testId']
-> = (input) => (testId) => async (originalUrl) => {
-    return (await httpClient.put(`${originalUrl}/${testId}`, input)).data;
+> = (params) => async (originalUrl) => {
+    return (await httpClient.put(`${originalUrl}/${params?.id}`, params?.input))
+        .data;
 };
 
 export const deleteOneTestByIdRestHandler: RestHandler<
     Test,
     DeleteOneTestByIdInput,
     DeleteOneTestByIdInput['testId']
-> = () => (testId) => async (originalUrl) => {
-    return (await httpClient.delete(`${originalUrl}/${testId}`)).data;
+> = (params) => async (originalUrl) => {
+    return (await httpClient.delete(`${originalUrl}/${params?.id}`)).data;
 };

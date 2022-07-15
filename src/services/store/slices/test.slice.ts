@@ -6,14 +6,13 @@ import {TEST_ACTIONTYPE} from '../actionTypes/test.actionType';
 import {DispatchGetter} from '../../../types/DispatchGetter.type';
 import {StateSelector} from '../../../types/StateSelector.type';
 import {Test} from '../../../interfaces/Test.interface';
-import {HttpRequestMethod} from '../../../types/HttpRequestMethod.type';
+import {RestEndpoint} from '../../../types/RestEndpoint.type';
 
 interface SliceState {
     loading: boolean;
     success: boolean;
     message: string;
-    requestedOriginalUrl: string;
-    requestedMethod: HttpRequestMethod;
+    requestedEndpoint: RestEndpoint;
     test: Test;
 }
 
@@ -21,8 +20,10 @@ const initialState: SliceState = {
     loading: true,
     success: true,
     message: '',
-    requestedOriginalUrl: '',
-    requestedMethod: 'POST',
+    requestedEndpoint: {
+        originalUrl: '',
+        method: 'POST',
+    },
     test: {
         id: 0,
         name: '',
@@ -53,11 +54,9 @@ const reducer: Reducer<SliceState, SliceAction> = (state, action) => {
                 loading: action.payload?.loading ?? state.loading,
                 success: action.payload?.success ?? state.success,
                 message: action.payload?.message ?? state.message,
-                requestedMethod:
-                    action.payload?.requestedMethod ?? state.requestedMethod,
-                requestedOriginalUrl:
-                    action.payload?.requestedOriginalUrl ??
-                    state.requestedOriginalUrl,
+                requestedEndpoint:
+                    action.payload?.requestedEndpoint ??
+                    state.requestedEndpoint,
                 test: action.payload?.test ?? state.test,
             };
         }
