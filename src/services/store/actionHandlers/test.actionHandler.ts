@@ -13,19 +13,17 @@ import {
     deleteOneTestByIdRestHandler,
     updateOneTestByIdRestHandler,
 } from '../../webApis/restHandlers/test.restHandler';
-import {TEST_ACTIONTYPE} from '../actionTypes/test.actionType';
 import {GlobalState} from '../useStore';
 
 export const createLocalTestActionHandler: ActionHandler<
-    TEST_ACTIONTYPE,
-    GlobalState['testState'],
-    string
-> = (dispatcher) => (params) => {
+    string,
+    GlobalState['testDispatcher']
+> = (input) => (dispatcher) => {
     try {
         dispatcher({
             type: 'CREATE_LOCAL_TEST',
             payload: {
-                message: params.input,
+                message: input,
             },
         });
     } catch (error) {
@@ -34,10 +32,9 @@ export const createLocalTestActionHandler: ActionHandler<
 };
 
 export const createOneTestActionHandler: HttpActionHandler<
-    TEST_ACTIONTYPE,
-    GlobalState['testState'],
-    CreateOneTestInput
-> = (dispatcher) => (params) => async (restEndpoint) => {
+    CreateOneTestInput,
+    GlobalState['testDispatcher']
+> = (input) => (dispatcher) => async (restEndpoint) => {
     try {
         dispatcher({
             type: 'TEST_ACTION_LOADING',
@@ -46,9 +43,9 @@ export const createOneTestActionHandler: HttpActionHandler<
                 success: false,
             },
         });
-        const createdTest = await createOneTestRestHandler({
-            input: {name: params.input?.name ?? ''},
-        })(restEndpoint.originalUrl);
+        const createdTest = await createOneTestRestHandler(input)(
+            restEndpoint.originalUrl
+        );
         dispatcher({
             type: 'TEST_ACTION_SUCCESS',
             payload: {
@@ -73,11 +70,9 @@ export const createOneTestActionHandler: HttpActionHandler<
 };
 
 export const updateOneTestByIdActionHandler: HttpActionHandler<
-    TEST_ACTIONTYPE,
-    GlobalState['testState'],
-    Omit<UpdateOneTestByIdInput, 'testId'>,
-    UpdateOneTestByIdInput['testId']
-> = (dispatcher) => (params) => async (endpoint) => {
+    UpdateOneTestByIdInput,
+    GlobalState['testDispatcher']
+> = (input) => (dispatcher) => async (endpoint) => {
     try {
         dispatcher({
             type: 'TEST_ACTION_LOADING',
@@ -87,7 +82,7 @@ export const updateOneTestByIdActionHandler: HttpActionHandler<
             },
         });
 
-        const updatedTest = await updateOneTestByIdRestHandler(params)(
+        const updatedTest = await updateOneTestByIdRestHandler(input)(
             endpoint.originalUrl
         );
         dispatcher({
@@ -113,11 +108,9 @@ export const updateOneTestByIdActionHandler: HttpActionHandler<
 };
 
 export const deleteOneTestByIdActionHandler: HttpActionHandler<
-    TEST_ACTIONTYPE,
-    GlobalState['testState'],
     DeleteOneTestByIdInput,
-    DeleteOneTestByIdInput['testId']
-> = (dispatcher) => (params) => async (endpoint) => {
+    GlobalState['testDispatcher']
+> = (input) => (dispatcher) => async (endpoint) => {
     try {
         dispatcher({
             type: 'TEST_ACTION_LOADING',
@@ -126,7 +119,7 @@ export const deleteOneTestByIdActionHandler: HttpActionHandler<
                 success: false,
             },
         });
-        const deletedTest = await deleteOneTestByIdRestHandler(params)(
+        const deletedTest = await deleteOneTestByIdRestHandler(input)(
             endpoint.originalUrl
         );
         dispatcher({

@@ -6,15 +6,10 @@ import {TEST_ACTIONTYPE} from '../actionTypes/test.actionType';
 import {DispatchGetter} from '../../../types/DispatchGetter.type';
 import {StateSelector} from '../../../types/StateSelector.type';
 import {Test} from '../../../interfaces/Test.interface';
-import {RestEndpoint} from '../../../types/RestEndpoint.type';
+import {Dispatcher} from '../../../types/Dispatcher.type';
+import {State} from '../../../types/State.type';
 
-interface SliceState {
-    loading: boolean;
-    success: boolean;
-    message: string;
-    requestedEndpoint: RestEndpoint;
-    test: Test;
-}
+type SliceState = State<Test>;
 
 const initialState: SliceState = {
     loading: true,
@@ -75,7 +70,7 @@ const reducer: Reducer<SliceState, SliceAction> = (state, action) => {
 
 export interface TestSlice {
     testState: SliceState;
-    testDispatcher: (action: SliceAction) => void;
+    testDispatcher: Dispatcher<SliceAction>;
 }
 
 export const createTestSlice: CreateSlice<GlobalState, TestSlice> = (
@@ -91,9 +86,7 @@ export const createTestSlice: CreateSlice<GlobalState, TestSlice> = (
     };
 };
 
-export const getTestDispatcher: DispatchGetter<
-    TEST_ACTIONTYPE,
-    ActionPayload
-> = (useStore) => useStore.getState().testDispatcher;
+export const getTestDispatcher: DispatchGetter<SliceAction> = (useStore) =>
+    useStore.getState().testDispatcher;
 export const testStateSelector: StateSelector<SliceState> = (state) =>
     state.testState;
