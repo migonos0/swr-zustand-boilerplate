@@ -95,9 +95,9 @@ function App() {
             <button
                 type="button"
                 onClick={() => {
-                    createLocalTestActionHandler(getTestDispatcher(useStore))({
-                        input: localInput,
-                    });
+                    createLocalTestActionHandler(localInput)(
+                        getTestDispatcher(useStore)
+                    );
                 }}
             >
                 Send
@@ -112,11 +112,9 @@ function App() {
             <button
                 type="button"
                 onClick={() => {
-                    createOneTestActionHandler(getTestDispatcher(useStore))({
-                        input: {
-                            name: remoteInput,
-                        },
-                    })(CREATE_ONE_TEST_RESTENDPOINT);
+                    createOneTestActionHandler({name: remoteInput})(
+                        getTestDispatcher(useStore)
+                    )(CREATE_ONE_TEST_RESTENDPOINT);
                 }}
             >
                 Send
@@ -129,12 +127,12 @@ function App() {
                             <button
                                 type="button"
                                 onClick={() => {
-                                    updateOneTestByIdActionHandler(
-                                        getTestDispatcher(useStore)
-                                    )({
-                                        input: {name: remoteInput},
-                                        id: test.id,
-                                    })(UPDATE_ONE_TEST_BY_ID_RESTENDPOINT);
+                                    updateOneTestByIdActionHandler({
+                                        testId: test.id,
+                                        name: remoteInput,
+                                    })(getTestDispatcher(useStore))(
+                                        UPDATE_ONE_TEST_BY_ID_RESTENDPOINT
+                                    );
                                 }}
                             >
                                 Update
@@ -142,9 +140,9 @@ function App() {
                             <button
                                 type="button"
                                 onClick={() => {
-                                    deleteOneTestByIdActionHandler(
-                                        getTestDispatcher(useStore)
-                                    )({id: test.id})(
+                                    deleteOneTestByIdActionHandler({
+                                        testId: test.id,
+                                    })(getTestDispatcher(useStore))(
                                         DELETE_ONE_TEST_BY_ID_RESTENDPOINT
                                     );
                                 }}

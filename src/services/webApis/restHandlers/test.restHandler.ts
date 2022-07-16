@@ -8,37 +8,33 @@ import {
 import {GETRestHandler, RestHandler} from '../../../types/RestHandler.type';
 import {httpClient} from '../../../libs/httpClient.lib';
 
-export const createOneTestRestHandler: RestHandler<Test, CreateOneTestInput> =
-    (params) => async (originalUrl) => {
-        return (await httpClient.post(originalUrl, params?.input)).data;
+export const createOneTestRestHandler: RestHandler<CreateOneTestInput, Test> =
+    (input) => async (originalUrl) => {
+        return (await httpClient.post(originalUrl, input)).data;
     };
 
 export const findOneTestByIdRestHandler: GETRestHandler<
-    Test,
     FindOneTestByIdInput,
-    FindOneTestByIdInput['testId']
-> = (params) => async (originalUrl) => {
-    return (await httpClient.get(`${originalUrl}/${params?.id}`)).data;
+    Test
+> = (input) => async (originalUrl) => {
+    return (await httpClient.get(`${originalUrl}/${input?.testId}`)).data;
 };
 
-export const findAllTestsHandler: GETRestHandler<Test[]> =
+export const findAllTestsHandler: GETRestHandler<void, Test[]> =
     () => async (originalUrl) => {
         return (await httpClient.get(originalUrl)).data;
     };
 
 export const updateOneTestByIdRestHandler: RestHandler<
-    Test,
-    Omit<UpdateOneTestByIdInput, 'testId'>,
-    UpdateOneTestByIdInput['testId']
-> = (params) => async (originalUrl) => {
-    return (await httpClient.put(`${originalUrl}/${params?.id}`, params?.input))
-        .data;
+    UpdateOneTestByIdInput,
+    Test
+> = (input) => async (originalUrl) => {
+    return (await httpClient.put(`${originalUrl}/${input.testId}`, input)).data;
 };
 
 export const deleteOneTestByIdRestHandler: RestHandler<
-    Test,
     DeleteOneTestByIdInput,
-    DeleteOneTestByIdInput['testId']
-> = (params) => async (originalUrl) => {
-    return (await httpClient.delete(`${originalUrl}/${params?.id}`)).data;
+    Test
+> = (input) => async (originalUrl) => {
+    return (await httpClient.delete(`${originalUrl}/${input.testId}`)).data;
 };

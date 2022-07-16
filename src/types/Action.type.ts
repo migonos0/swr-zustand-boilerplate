@@ -1,4 +1,4 @@
-export type Action<Type extends string, Payload> = {
-  type: Type;
-  payload?: Partial<Payload>;
+export type Action<Type extends string, Payload = unknown> = {
+    type: Type;
+    payload?: Partial<Payload>;
 };
