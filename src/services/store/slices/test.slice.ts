@@ -8,8 +8,12 @@ import {StateSelector} from '../../../types/StateSelector.type';
 import {Test} from '../../../interfaces/Test.interface';
 import {Dispatcher} from '../../../types/Dispatcher.type';
 import {State} from '../../../types/State.type';
+import {RestEndpoint} from '../../../types/RestEndpoint.type';
 
-type SliceState = State<Test>;
+interface SliceState extends State {
+    test: Test;
+    requestedEndpoint: RestEndpoint;
+}
 
 const initialState: SliceState = {
     loading: true,
